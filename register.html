@@ -202,11 +202,21 @@
       <label>Ngày làm</label>
       <input type="date" id="dateInput" required />
 
-      <label>Chọn ca</label>
+      <label>Giờ làm việc</label>
       <div class="shifts">
-        <label><input type="checkbox" name="shift" value="morning"> 🌅 Ca sáng (09:00 - 13:00)</label>
-        <label><input type="checkbox" name="shift" value="afternoon"> ☀️ Ca chiều (13:00 - 17:00)</label>
-        <label><input type="checkbox" name="shift" value="evening"> 🌙 Ca tối (17:00 - 22:00)</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px;">
+          <div>
+            <label style="font-size: 13px; margin-bottom: 5px;">⏰ Giờ bắt đầu</label>
+            <input type="time" id="startTime" required style="padding: 12px; width: 100%; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px; background: white;">
+          </div>
+          <div>
+            <label style="font-size: 13px; margin-bottom: 5px;">⏰ Giờ kết thúc</label>
+            <input type="time" id="endTime" required style="padding: 12px; width: 100%; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px; background: white;">
+          </div>
+        </div>
+        <p style="font-size: 13px; color: #666; margin-top: 10px;">
+          💡 Ví dụ: 09:00 - 13:00 hoặc 14:00 - 18:00
+        </p>
       </div>
 
       <button class="btn btn-primary" type="submit">Gửi đăng ký</button>
@@ -295,28 +305,44 @@
       const staffId = document.getElementById('staffSelect').value;
       const staffName = document.getElementById('staffSelect').options[document.getElementById('staffSelect').selectedIndex].text;
       const date = document.getElementById('dateInput').value;
-      const checked = Array.from(document.querySelectorAll('input[name="shift"]:checked')).map(c => c.value);
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
 
+      if (!staffId) { alert('Vui lòng chọn nhân viên.'); return; }
       if (!date) { alert('Vui lòng chọn ngày.'); return; }
-      if (checked.length === 0) { alert('Vui lòng chọn ít nhất 1 ca.'); return; }
+      if (!startTime || !endTime) { alert('Vui lòng nhập đầy đủ giờ làm việc.'); return; }
+
+      // Kiểm tra giờ kết thúc phải sau giờ bắt đầu
+      if (startTime >= endTime) {
+        alert('Giờ kết thúc phải sau giờ bắt đầu!');
+        return;
+      }
+
+      // Tạo chuỗi ca làm việc
+      const shiftTime = `${startTime} - ${endTime}`;
 
       // load and append
       const regs = loadRegs();
-      // for each selected shift, push a registration entry
-      checked.forEach(shift => {
-        regs.push({
-          id: Date.now() + Math.random(), // simple unique id
-          user_id: staffId,
-          user_name: staffName,
-          date: date,
-          shift: shift,
-          created_at: new Date().toISOString()
-        });
+      regs.push({
+        id: Date.now() + Math.random(), // simple unique id
+        user_id: staffId,
+        user_name: staffName,
+        date: date,
+        shift: 'custom', // đánh dấu là ca tùy chỉnh
+        shift_time: shiftTime, // lưu giờ cụ thể
+        start_time: startTime,
+        end_time: endTime,
+        created_at: new Date().toISOString()
       });
       saveRegs(regs);
-      alert('Đăng ký thành công!');
-      // reset form
-      document.getElementById('regForm').reset();
+      alert(`Đăng ký thành công!\n\nNgày: ${date}\nGiờ: ${shiftTime}`);
+      // reset form (trừ staff nếu là nhân viên)
+      document.getElementById('dateInput').value = '';
+      document.getElementById('startTime').value = '';
+      document.getElementById('endTime').value = '';
+      if (currentUser.role === 'admin') {
+        document.getElementById('staffSelect').value = '';
+      }
     });
 
     document.getElementById('goAdmin').addEventListener('click', function(){

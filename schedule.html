@@ -258,19 +258,37 @@
         tbody.innerHTML = '<tr><td colspan="4" style="padding: 40px; color: #999;">Chưa có lịch (hãy chạy "Tự phân ca" ở trang quản lý)</td></tr>';
         return;
       }
-      // sort by date then shift
-      const order = { morning:1, afternoon:2, evening:3 };
-      const shiftLabels = {
-        morning: '🌅 Ca sáng',
-        afternoon: '☀️ Ca chiều', 
-        evening: '🌙 Ca tối'
-      };
-      sch.sort((a,b) => a.date.localeCompare(b.date) || (order[a.shift] - order[b.shift]) || a.user_name.localeCompare(b.user_name));
+      // sort by date then by start time if available
+      sch.sort((a,b) => {
+        const dateCompare = a.date.localeCompare(b.date);
+        if (dateCompare !== 0) return dateCompare;
+        // Nếu có start_time thì sort theo giờ
+        if (a.start_time && b.start_time) {
+          return a.start_time.localeCompare(b.start_time);
+        }
+        return a.user_name.localeCompare(b.user_name);
+      });
+
       sch.forEach(s => {
         const tr = document.createElement('tr');
-        const shiftClass = `shift-${s.shift}`;
-        const shiftLabel = shiftLabels[s.shift] || s.shift;
-        tr.innerHTML = `<td><strong>${s.date}</strong></td><td><span class="shift-badge ${shiftClass}">${shiftLabel}</span></td><td>${s.user_name}</td><td>${s.assigned_by}</td>`;
+        // Hiển thị giờ tùy chỉnh hoặc badge cho ca cũ
+        let shiftDisplay;
+        if (s.shift_time) {
+          // Giờ tùy chỉnh
+          shiftDisplay = `<span style="color: #667eea; font-weight: 600;">⏰ ${s.shift_time}</span>`;
+        } else {
+          // Ca cố định cũ (nếu còn)
+          const shiftLabels = {
+            morning: '🌅 Ca sáng',
+            afternoon: '☀️ Ca chiều', 
+            evening: '🌙 Ca tối'
+          };
+          const shiftClass = `shift-${s.shift}`;
+          const shiftLabel = shiftLabels[s.shift] || s.shift;
+          shiftDisplay = `<span class="shift-badge ${shiftClass}">${shiftLabel}</span>`;
+        }
+        
+        tr.innerHTML = `<td><strong>${s.date}</strong></td><td>${shiftDisplay}</td><td>${s.user_name}</td><td>${s.assigned_by}</td>`;
         tbody.appendChild(tr);
       });
     }

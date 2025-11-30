@@ -161,6 +161,54 @@
       font-size: 16px;
     }
     
+    .config-section {
+      margin-bottom: 24px;
+      padding: 20px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 12px;
+      border: 2px solid #e0e0e0;
+    }
+    
+    .config-section h3 {
+      color: #667eea;
+      font-size: 16px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    
+    .shift-config {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    
+    .shift-config-item {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .shift-config-item label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    
+    .shift-config-item input {
+      padding: 10px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    .shift-config-item input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
     .table-container {
       overflow-x: auto;
       border-radius: 12px;
@@ -321,58 +369,91 @@
         tbody.innerHTML = '<tr><td colspan="4">Chưa có đăng ký</td></tr>';
         return;
       }
-      regs.sort((a,b) => a.date.localeCompare(b.date) || a.shift.localeCompare(b.shift) || a.user_name.localeCompare(b.user_name));
+      regs.sort((a,b) => a.date.localeCompare(b.date) || a.user_name.localeCompare(b.user_name));
       regs.forEach(r => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${r.user_name}</td><td>${r.date}</td><td>${r.shift}</td><td>${new Date(r.created_at).toLocaleString()}</td>`;
+        // Hiển thị giờ tùy chỉnh nếu có, nếu không thì hiển thị ca cũ
+        let shiftDisplay;
+        if (r.shift_time) {
+          shiftDisplay = `<strong style="color: #667eea;">${r.shift_time}</strong>`;
+        } else if (r.shift === 'custom' && r.start_time && r.end_time) {
+          shiftDisplay = `<strong style="color: #667eea;">${r.start_time} - ${r.end_time}</strong>`;
+        } else {
+          // Dữ liệu cũ với ca cố định
+          const shiftLabels = {
+            morning: '🌅 Ca sáng (09:00-13:00)',
+            afternoon: '☀️ Ca chiều (13:00-17:00)',
+            evening: '🌙 Ca tối (17:00-22:00)'
+          };
+          shiftDisplay = shiftLabels[r.shift] || r.shift;
+        }
+        tr.innerHTML = `<td>${r.user_name}</td><td>${r.date}</td><td>${shiftDisplay}</td><td>${new Date(r.created_at).toLocaleString()}</td>`;
         tbody.appendChild(tr);
       });
     }
 
-    document.getElementById('refreshBtn').addEventListener('click', renderTable);
-    window.addEventListener('load', renderTable);
-
-    document.getElementById('viewSchedule').addEventListener('click', ()=> location.href='schedule.html');
-
-    // Clear demo data
-    document.getElementById('clearBtn').addEventListener('click', ()=>{
-      if(!confirm('Xoá toàn bộ đăng ký & lịch demo?')) return;
-      localStorage.removeItem(LS_KEY);
-      localStorage.removeItem(LS_SCHEDULE);
+    // Load cấu hình và setup event listeners khi trang load
+    window.addEventListener('load', function() {
+      // Render bảng
       renderTable();
-      alert('Đã xoá dữ liệu demo.');
-    });
 
-    // ---- AUTO ASSIGN logic (chỉ lấy từ danh sách đăng ký) ----
-    document.getElementById('autoBtn').addEventListener('click', function(){
-      // Strategy:
-      // 1) Lấy tất cả đăng ký có sẵn
-      // 2) Chuyển đổi tất cả đăng ký thành lịch làm
-      // 3) Không tự động thêm nhân viên nếu thiếu người
-      // 4) Lưu lịch và hiển thị
+      // Setup event listeners cho các nút
+      document.getElementById('refreshBtn').addEventListener('click', renderTable);
 
-      const regs = loadRegs();
+      document.getElementById('viewSchedule').addEventListener('click', ()=> location.href='schedule.html');
 
-      if (regs.length === 0) {
-        alert('Không có đăng ký nào. Vui lòng đăng ký ca trước!');
-        return;
-      }
+      // Clear demo data
+      document.getElementById('clearBtn').addEventListener('click', ()=>{
+        if(!confirm('Xoá toàn bộ đăng ký & lịch demo?')) return;
+        localStorage.removeItem(LS_KEY);
+        localStorage.removeItem(LS_SCHEDULE);
+        renderTable();
+        alert('Đã xoá dữ liệu demo.');
+      });
 
-      // Chuyển đổi tất cả đăng ký thành lịch làm
-      const schedule = regs.map(r => ({
-        id: Date.now() + Math.random(),
-        user_id: r.user_id,
-        user_name: r.user_name,
-        date: r.date,
-        shift: r.shift,
-        assigned_at: new Date().toISOString(),
-        assigned_by: 'từ đăng ký'
-      }));
+      // ---- AUTO ASSIGN logic (chỉ lấy từ danh sách đăng ký với giờ tùy chỉnh) ----
+      document.getElementById('autoBtn').addEventListener('click', function(){
+        // Strategy:
+        // 1) Lấy tất cả đăng ký có sẵn
+        // 2) Chuyển tất cả đăng ký thành lịch làm (giữ nguyên giờ tùy chỉnh)
+        // 3) Lưu lịch và hiển thị
 
-      // save schedule
-      saveSchedule(schedule);
-      alert(`Đã tạo lịch từ ${regs.length} đăng ký. Mở trang lịch để xem kết quả.`);
-      window.location.href = 'schedule.html';
+        const regs = loadRegs();
+
+        if (regs.length === 0) {
+          alert('Không có đăng ký nào. Vui lòng đăng ký ca trước!');
+          return;
+        }
+
+        // Chuyển đổi tất cả đăng ký thành lịch làm (giữ nguyên giờ tùy chỉnh)
+        const schedule = regs.map(r => {
+          // Xây dựng shift_time từ start_time và end_time nếu chưa có
+          let shiftTime = r.shift_time;
+          if (!shiftTime && r.start_time && r.end_time) {
+            shiftTime = `${r.start_time} - ${r.end_time}`;
+          }
+          
+          return {
+            id: Date.now() + Math.random(),
+            user_id: r.user_id,
+            user_name: r.user_name,
+            date: r.date,
+            shift: r.shift,
+            shift_time: shiftTime, // Giữ giờ tùy chỉnh
+            start_time: r.start_time,
+            end_time: r.end_time,
+            assigned_at: new Date().toISOString(),
+            assigned_by: 'phân ca tự động'
+          };
+        });
+
+        // save schedule
+        saveSchedule(schedule);
+        
+        const totalRegs = regs.length;
+        alert(`✅ Đã phân ca thành công!\n\n📊 Tổng số đăng ký: ${totalRegs}\n✅ Đã sắp vào lịch: ${totalRegs}\n\nTất cả ca làm đã được xếp vào lịch theo giờ đăng ký.`);
+        window.location.href = 'schedule.html';
+      });
     });
   </script>
 </body>
