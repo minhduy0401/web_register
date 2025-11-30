@@ -166,6 +166,36 @@
       color: white;
     }
     
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      
+      .container {
+        box-shadow: none;
+        padding: 20px;
+      }
+      
+      .user-info-bar,
+      .btn {
+        display: none !important;
+      }
+      
+      h2 {
+        color: #000;
+      }
+      
+      table {
+        page-break-inside: avoid;
+      }
+      
+      tbody tr:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+    
     @media (max-width: 768px) {
       .container {
         padding: 20px;
@@ -196,6 +226,12 @@
     </div>
 
     <button class="btn btn-back" id="backBtn">← Quay lại quản lý</button>
+    
+    <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <button class="btn btn-success" id="exportExcelBtn">📊 Xuất Excel</button>
+      <button class="btn btn-info" id="exportPDFBtn">📄 Xuất PDF</button>
+      <button class="btn btn-primary" id="printBtn">🖨️ In lịch</button>
+    </div>
     
     <div class="table-container">
       <table id="scheduleTable">
@@ -294,6 +330,109 @@
     }
 
     document.getElementById('backBtn').addEventListener('click', ()=> location.href='admin.html');
+
+    // Export to Excel (CSV format)
+    document.getElementById('exportExcelBtn').addEventListener('click', function() {
+      const sch = loadSchedule();
+      if (sch.length === 0) {
+        alert('Không có dữ liệu để xuất!');
+        return;
+      }
+
+      let csv = 'Ngày,Giờ làm,Nhân viên,Ghi chú\n';
+      sch.forEach(s => {
+        const shiftTime = s.shift_time || s.shift || '';
+        csv += `"${s.date}","${shiftTime}","${s.user_name}","${s.assigned_by}"\n`;
+      });
+
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `lich_lam_${new Date().toISOString().slice(0,10)}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      alert('✅ Đã xuất file Excel!');
+    });
+
+    // Export to PDF (simple HTML to print)
+    document.getElementById('exportPDFBtn').addEventListener('click', function() {
+      const sch = loadSchedule();
+      if (sch.length === 0) {
+        alert('Không có dữ liệu để xuất!');
+        return;
+      }
+
+      let htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Lịch làm việc</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { text-align: center; color: #667eea; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background: #667eea; color: white; }
+            tr:nth-child(even) { background: #f2f2f2; }
+            .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <h1>📅 LỊCH LÀM VIỆC</h1>
+          <p><strong>Ngày xuất:</strong> ${new Date().toLocaleString('vi-VN')}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Ngày</th>
+                <th>Giờ làm</th>
+                <th>Nhân viên</th>
+                <th>Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      sch.forEach(s => {
+        const shiftTime = s.shift_time || s.shift || '';
+        htmlContent += `
+          <tr>
+            <td>${s.date}</td>
+            <td>${shiftTime}</td>
+            <td>${s.user_name}</td>
+            <td>${s.assigned_by}</td>
+          </tr>
+        `;
+      });
+
+      htmlContent += `
+            </tbody>
+          </table>
+          <div class="footer">
+            <p>Hệ thống quản lý ca làm việc - Tạo bởi Admin</p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `lich_lam_${new Date().toISOString().slice(0,10)}.html`;
+      link.click();
+      
+      alert('✅ Đã xuất file PDF (HTML)!\n\nMở file và dùng trình duyệt để in ra PDF (Ctrl+P > Save as PDF)');
+    });
+
+    // Print functionality
+    document.getElementById('printBtn').addEventListener('click', function() {
+      window.print();
+    });
 
     window.addEventListener('load', render);
   </script>

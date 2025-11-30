@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Lịch sử & Nhật ký - Hệ thống đăng ký ca làm</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px;
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    h2 { 
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    
+    .user-info-bar {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+    }
+    
+    .user-info-bar .user-name {
+      color: #667eea;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn { 
+      padding: 10px 18px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+    }
+    
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+    
+    .btn-secondary:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .filter-section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    
+    .filter-section label {
+      margin-right: 10px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .filter-section select,
+    .filter-section input {
+      padding: 8px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      margin-right: 10px;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    
+    table { 
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    
+    th, td { 
+      border: 1px solid #e0e0e0;
+      padding: 12px 10px;
+      text-align: left;
+      font-size: 13px;
+    }
+    
+    th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    td {
+      color: #555;
+    }
+    
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+    
+    tbody tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+    
+    tbody tr:hover {
+      background: #e3e8ff;
+      transform: scale(1.005);
+    }
+    
+    .action-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    .action-create {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .action-update {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .action-delete {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .action-assign {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h2 {
+        font-size: 22px;
+      }
+      
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      table {
+        font-size: 11px;
+      }
+      
+      th, td {
+        padding: 8px 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📜 Lịch sử & Nhật ký</h2>
+
+    <div class="user-info-bar">
+      <span class="user-name">👤 <span id="userName"></span></span>
+      <button class="btn btn-secondary" id="logoutBtn" style="margin-left: 10px; padding: 8px 16px; display: inline-block; width: auto; margin-top: 0;">🚪 Đăng xuất</button>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="backBtn">← Quay lại quản lý</button>
+      <button class="btn btn-primary" id="refreshBtn">🔄 Tải lại</button>
+      <button class="btn btn-secondary" id="clearHistoryBtn">🗑️ Xóa lịch sử cũ (>30 ngày)</button>
+    </div>
+
+    <div class="filter-section">
+      <label>Lọc theo:</label>
+      <select id="actionFilter">
+        <option value="all">Tất cả hành động</option>
+        <option value="create">Tạo mới</option>
+        <option value="update">Cập nhật</option>
+        <option value="delete">Xóa</option>
+        <option value="assign">Phân ca</option>
+      </select>
+      
+      <select id="userFilter">
+        <option value="all">Tất cả người dùng</option>
+      </select>
+      
+      <input type="date" id="dateFilter" placeholder="Lọc theo ngày">
+      
+      <button class="btn btn-primary" id="applyFilterBtn" style="padding: 8px 16px;">Áp dụng</button>
+    </div>
+
+    <div class="table-container">
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>🕒 Thời gian</th>
+            <th>👤 Người thực hiện</th>
+            <th>📋 Hành động</th>
+            <th>📝 Mô tả</th>
+            <th>💾 Dữ liệu</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const LS_AUTH = 'shift_auth_user';
+    const LS_HISTORY = 'shift_history_log';
+
+    function checkAuth() {
+      const authData = localStorage.getItem(LS_AUTH);
+      if (!authData) {
+        window.location.href = 'login.html';
+        return null;
+      }
+      try {
+        const user = JSON.parse(authData);
+        if (user.role !== 'admin') {
+          alert('Bạn không có quyền truy cập trang này!');
+          window.location.href = 'register.html';
+          return null;
+        }
+        return user;
+      } catch (e) {
+        localStorage.removeItem(LS_AUTH);
+        window.location.href = 'login.html';
+        return null;
+      }
+    }
+
+    function logout() {
+      if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        localStorage.removeItem(LS_AUTH);
+        window.location.href = 'login.html';
+      }
+    }
+
+    const currentUser = checkAuth();
+    if (currentUser) {
+      document.getElementById('userName').textContent = currentUser.name;
+    }
+
+    function loadHistory() {
+      const raw = localStorage.getItem(LS_HISTORY);
+      return raw ? JSON.parse(raw) : [];
+    }
+
+    function saveHistory(history) {
+      localStorage.setItem(LS_HISTORY, JSON.stringify(history));
+    }
+
+    // Add history entry (called from other pages)
+    window.addHistoryLog = function(action, description, data = {}) {
+      const history = loadHistory();
+      const authData = localStorage.getItem(LS_AUTH);
+      const user = authData ? JSON.parse(authData) : { name: 'Unknown', user_id: 'unknown' };
+      
+      history.unshift({
+        id: Date.now() + Math.random(),
+        timestamp: new Date().toISOString(),
+        user_name: user.name,
+        user_id: user.user_id,
+        action: action,
+        description: description,
+        data: JSON.stringify(data),
+        ip: 'localhost'
+      });
+      
+      // Giữ tối đa 1000 records
+      if (history.length > 1000) {
+        history.splice(1000);
+      }
+      
+      saveHistory(history);
+    };
+
+    function renderHistory(filter = {}) {
+      let history = loadHistory();
+      const tbody = document.querySelector('#historyTable tbody');
+      tbody.innerHTML = '';
+
+      if (history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #999;">Chưa có lịch sử nào</td></tr>';
+        return;
+      }
+
+      // Apply filters
+      if (filter.action && filter.action !== 'all') {
+        history = history.filter(h => h.action === filter.action);
+      }
+      if (filter.user && filter.user !== 'all') {
+        history = history.filter(h => h.user_id === filter.user);
+      }
+      if (filter.date) {
+        history = history.filter(h => h.timestamp.startsWith(filter.date));
+      }
+
+      // Populate user filter dropdown
+      const userFilter = document.getElementById('userFilter');
+      const users = [...new Set(loadHistory().map(h => h.user_name))];
+      const currentUserFilterValue = userFilter.value;
+      userFilter.innerHTML = '<option value="all">Tất cả người dùng</option>';
+      users.forEach(userName => {
+        const option = document.createElement('option');
+        option.value = userName;
+        option.textContent = userName;
+        if (userName === currentUserFilterValue) option.selected = true;
+        userFilter.appendChild(option);
+      });
+
+      history.forEach(h => {
+        const tr = document.createElement('tr');
+        const actionClass = `action-${h.action}`;
+        const actionLabels = {
+          create: '✅ Tạo mới',
+          update: '✏️ Cập nhật',
+          delete: '🗑️ Xóa',
+          assign: '📋 Phân ca'
+        };
+        
+        tr.innerHTML = `
+          <td>${new Date(h.timestamp).toLocaleString('vi-VN')}</td>
+          <td><strong>${h.user_name}</strong></td>
+          <td><span class="action-badge ${actionClass}">${actionLabels[h.action] || h.action}</span></td>
+          <td>${h.description}</td>
+          <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: #888;">${h.data}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('backBtn').addEventListener('click', () => location.href = 'admin.html');
+    document.getElementById('refreshBtn').addEventListener('click', () => renderHistory());
+    
+    document.getElementById('applyFilterBtn').addEventListener('click', () => {
+      const filter = {
+        action: document.getElementById('actionFilter').value,
+        user: document.getElementById('userFilter').value,
+        date: document.getElementById('dateFilter').value
+      };
+      renderHistory(filter);
+    });
+
+    document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+      if (!confirm('Xóa tất cả lịch sử cũ hơn 30 ngày?')) return;
+      
+      let history = loadHistory();
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const filtered = history.filter(h => new Date(h.timestamp) > thirtyDaysAgo);
+      const removed = history.length - filtered.length;
+      
+      saveHistory(filtered);
+      alert(`Đã xóa ${removed} bản ghi cũ.`);
+      renderHistory();
+    });
+
+    window.addEventListener('load', renderHistory);
+  </script>
+</body>
+</html>

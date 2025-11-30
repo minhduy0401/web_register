@@ -291,12 +291,34 @@
 
     // ---- Utility: get/save registrations to localStorage
     const LS_KEY = 'shift_registrations_demo';
+    const LS_HISTORY = 'shift_history_log';
+    
     function loadRegs() {
       const raw = localStorage.getItem(LS_KEY);
       return raw ? JSON.parse(raw) : [];
     }
     function saveRegs(arr) {
       localStorage.setItem(LS_KEY, JSON.stringify(arr));
+    }
+
+    function addHistoryLog(action, description, data = {}) {
+      const raw = localStorage.getItem(LS_HISTORY);
+      const history = raw ? JSON.parse(raw) : [];
+      const user = currentUser || { name: 'Unknown', user_id: 'unknown' };
+      
+      history.unshift({
+        id: Date.now() + Math.random(),
+        timestamp: new Date().toISOString(),
+        user_name: user.name,
+        user_id: user.user_id,
+        action: action,
+        description: description,
+        data: JSON.stringify(data),
+        ip: 'localhost'
+      });
+      
+      if (history.length > 1000) history.splice(1000);
+      localStorage.setItem(LS_HISTORY, JSON.stringify(history));
     }
 
     // Submit handler
@@ -335,6 +357,14 @@
         created_at: new Date().toISOString()
       });
       saveRegs(regs);
+      
+      addHistoryLog('create', `Đăng ký ca làm: ${staffName} - ${date} (${shiftTime})`, {
+        user_id: staffId,
+        user_name: staffName,
+        date: date,
+        shift_time: shiftTime
+      });
+      
       alert(`Đăng ký thành công!\n\nNgày: ${date}\nGiờ: ${shiftTime}`);
       // reset form (trừ staff nếu là nhân viên)
       document.getElementById('dateInput').value = '';
