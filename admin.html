@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Quản lý đăng ký - Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px;
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    h2 { 
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    
+    .controls { 
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .controls input[type=date] {
+      padding: 10px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+    }
+    
+    .controls input[type=date]:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .btn { 
+      padding: 10px 18px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+    }
+    
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(17, 153, 142, 0.6);
+    }
+    
+    .btn-info {
+      background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(58, 123, 213, 0.4);
+    }
+    
+    .btn-info:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(58, 123, 213, 0.6);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #ed213a 0%, #93291e 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(237, 33, 58, 0.4);
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(237, 33, 58, 0.6);
+    }
+    
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+    
+    .btn-secondary:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .user-info-bar {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+    }
+    
+    .user-info-bar .user-name {
+      color: #667eea;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    table { 
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    
+    th, td { 
+      border: 1px solid #e0e0e0;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    
+    th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 13px;
+    }
+    
+    td {
+      font-size: 14px;
+      color: #555;
+    }
+    
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+    
+    tbody tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+    
+    tbody tr:hover {
+      background: #e3e8ff;
+      transform: scale(1.01);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      h2 {
+        font-size: 22px;
+      }
+      
+      table {
+        font-size: 12px;
+      }
+      
+      th, td {
+        padding: 10px 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🎯 Quản lý: Danh sách đăng ký</h2>
+
+    <!-- User info and logout -->
+    <div class="user-info-bar">
+      <span class="user-name">👤 <span id="userName"></span></span>
+      <button class="btn btn-info" id="goRegister" style="margin-left: 10px; padding: 8px 16px; display: inline-block; width: auto; margin-top: 0;">📋 Đăng ký ca</button>
+      <button class="btn btn-secondary" id="logoutBtn" style="margin-left: 10px; padding: 8px 16px; display: inline-block; width: auto; margin-top: 0;">🚪 Đăng xuất</button>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="refreshBtn">🔄 Tải lại</button>
+      <button class="btn btn-success" id="autoBtn">👑 Tự phân ca</button>
+      <button class="btn btn-info" id="viewSchedule">📊 Xem lịch đã sắp</button>
+      <button class="btn btn-danger" id="clearBtn" title="Xoá mọi đăng ký & lịch demo">🗑️ Xoá dữ liệu</button>
+    </div>
+
+    <div class="table-container">
+      <table id="regTable">
+        <thead>
+          <tr><th>👤 Người</th><th>📅 Ngày</th><th>⏰ Ca</th><th>🕒 Đăng ký lúc</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ---- Authentication check ----
+    const LS_AUTH = 'shift_auth_user';
+    
+    function checkAuth() {
+      const authData = localStorage.getItem(LS_AUTH);
+      if (!authData) {
+        window.location.href = 'login.html';
+        return null;
+      }
+      try {
+        const user = JSON.parse(authData);
+        // Chỉ admin mới vào được trang này
+        if (user.role !== 'admin') {
+          alert('Bạn không có quyền truy cập trang này!');
+          window.location.href = 'register.html';
+          return null;
+        }
+        return user;
+      } catch (e) {
+        localStorage.removeItem(LS_AUTH);
+        window.location.href = 'login.html';
+        return null;
+      }
+    }
+
+    function logout() {
+      if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        localStorage.removeItem(LS_AUTH);
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Initialize page with auth
+    const currentUser = checkAuth();
+    if (currentUser) {
+      document.getElementById('userName').textContent = currentUser.name;
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('goRegister').addEventListener('click', () => location.href = 'register.html');
+
+    // ---- Original code ----
+    const LS_KEY = 'shift_registrations_demo';
+    const LS_SCHEDULE = 'shift_schedule_demo';
+
+    function loadRegs(){ const raw = localStorage.getItem(LS_KEY); return raw?JSON.parse(raw):[]; }
+    function saveSchedule(arr){ localStorage.setItem(LS_SCHEDULE, JSON.stringify(arr)); }
+    function loadSchedule(){ const raw = localStorage.getItem(LS_SCHEDULE); return raw?JSON.parse(raw):[]; }
+
+    function renderTable() {
+      const regs = loadRegs();
+      const tbody = document.querySelector('#regTable tbody');
+      tbody.innerHTML = '';
+      if (regs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4">Chưa có đăng ký</td></tr>';
+        return;
+      }
+      regs.sort((a,b) => a.date.localeCompare(b.date) || a.shift.localeCompare(b.shift) || a.user_name.localeCompare(b.user_name));
+      regs.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${r.user_name}</td><td>${r.date}</td><td>${r.shift}</td><td>${new Date(r.created_at).toLocaleString()}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', renderTable);
+    window.addEventListener('load', renderTable);
+
+    document.getElementById('viewSchedule').addEventListener('click', ()=> location.href='schedule.html');
+
+    // Clear demo data
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      if(!confirm('Xoá toàn bộ đăng ký & lịch demo?')) return;
+      localStorage.removeItem(LS_KEY);
+      localStorage.removeItem(LS_SCHEDULE);
+      renderTable();
+      alert('Đã xoá dữ liệu demo.');
+    });
+
+    // ---- AUTO ASSIGN logic (chỉ lấy từ danh sách đăng ký) ----
+    document.getElementById('autoBtn').addEventListener('click', function(){
+      // Strategy:
+      // 1) Lấy tất cả đăng ký có sẵn
+      // 2) Chuyển đổi tất cả đăng ký thành lịch làm
+      // 3) Không tự động thêm nhân viên nếu thiếu người
+      // 4) Lưu lịch và hiển thị
+
+      const regs = loadRegs();
+
+      if (regs.length === 0) {
+        alert('Không có đăng ký nào. Vui lòng đăng ký ca trước!');
+        return;
+      }
+
+      // Chuyển đổi tất cả đăng ký thành lịch làm
+      const schedule = regs.map(r => ({
+        id: Date.now() + Math.random(),
+        user_id: r.user_id,
+        user_name: r.user_name,
+        date: r.date,
+        shift: r.shift,
+        assigned_at: new Date().toISOString(),
+        assigned_by: 'từ đăng ký'
+      }));
+
+      // save schedule
+      saveSchedule(schedule);
+      alert(`Đã tạo lịch từ ${regs.length} đăng ký. Mở trang lịch để xem kết quả.`);
+      window.location.href = 'schedule.html';
+    });
+  </script>
+</body>
+</html>

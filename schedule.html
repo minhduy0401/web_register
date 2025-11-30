@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Lịch làm - Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px;
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    h2 { 
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    
+    .btn { 
+      padding: 12px 24px;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-bottom: 24px;
+      display: inline-block;
+    }
+    
+    .btn-back {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-back:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    table { 
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    
+    th, td { 
+      border: 1px solid #e0e0e0;
+      padding: 16px 12px;
+      text-align: center;
+    }
+    
+    th {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 13px;
+    }
+    
+    td {
+      font-size: 14px;
+      color: #555;
+    }
+    
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+    
+    tbody tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+    
+    tbody tr:hover {
+      background: #e3e8ff;
+      transform: scale(1.01);
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    }
+    
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+    
+    .btn-secondary:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .user-info-bar {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+    }
+    
+    .user-info-bar .user-name {
+      color: #667eea;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .shift-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .shift-morning {
+      background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+      color: #d63031;
+    }
+    
+    .shift-afternoon {
+      background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+      color: white;
+    }
+    
+    .shift-evening {
+      background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+      color: white;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h2 {
+        font-size: 22px;
+      }
+      
+      table {
+        font-size: 12px;
+      }
+      
+      th, td {
+        padding: 10px 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📅 Lịch làm đã sắp</h2>
+
+    <!-- User info and logout -->
+    <div class="user-info-bar">
+      <span class="user-name">👤 <span id="userName"></span></span>
+      <button class="btn btn-secondary" id="logoutBtn" style="margin-left: 10px; padding: 8px 16px; display: inline-block; width: auto; margin-top: 0;">🚪 Đăng xuất</button>
+    </div>
+
+    <button class="btn btn-back" id="backBtn">← Quay lại quản lý</button>
+    
+    <div class="table-container">
+      <table id="scheduleTable">
+        <thead><tr><th>📅 Ngày</th><th>⏰ Ca</th><th>👤 Nhân viên</th><th>📝 Ghi chú</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ---- Authentication check ----
+    const LS_AUTH = 'shift_auth_user';
+    
+    function checkAuth() {
+      const authData = localStorage.getItem(LS_AUTH);
+      if (!authData) {
+        window.location.href = 'login.html';
+        return null;
+      }
+      try {
+        const user = JSON.parse(authData);
+        // Chỉ admin mới vào được trang này
+        if (user.role !== 'admin') {
+          alert('Bạn không có quyền truy cập trang này!');
+          window.location.href = 'register.html';
+          return null;
+        }
+        return user;
+      } catch (e) {
+        localStorage.removeItem(LS_AUTH);
+        window.location.href = 'login.html';
+        return null;
+      }
+    }
+
+    function logout() {
+      if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        localStorage.removeItem(LS_AUTH);
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Initialize page with auth
+    const currentUser = checkAuth();
+    if (currentUser) {
+      document.getElementById('userName').textContent = currentUser.name;
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // ---- Original code ----
+    const LS_SCHEDULE = 'shift_schedule_demo';
+    function loadSchedule(){ const raw = localStorage.getItem(LS_SCHEDULE); return raw?JSON.parse(raw):[]; }
+
+    function render() {
+      const sch = loadSchedule();
+      const tbody = document.querySelector('#scheduleTable tbody');
+      tbody.innerHTML = '';
+      if (sch.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="padding: 40px; color: #999;">Chưa có lịch (hãy chạy "Tự phân ca" ở trang quản lý)</td></tr>';
+        return;
+      }
+      // sort by date then shift
+      const order = { morning:1, afternoon:2, evening:3 };
+      const shiftLabels = {
+        morning: '🌅 Ca sáng',
+        afternoon: '☀️ Ca chiều', 
+        evening: '🌙 Ca tối'
+      };
+      sch.sort((a,b) => a.date.localeCompare(b.date) || (order[a.shift] - order[b.shift]) || a.user_name.localeCompare(b.user_name));
+      sch.forEach(s => {
+        const tr = document.createElement('tr');
+        const shiftClass = `shift-${s.shift}`;
+        const shiftLabel = shiftLabels[s.shift] || s.shift;
+        tr.innerHTML = `<td><strong>${s.date}</strong></td><td><span class="shift-badge ${shiftClass}">${shiftLabel}</span></td><td>${s.user_name}</td><td>${s.assigned_by}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('backBtn').addEventListener('click', ()=> location.href='admin.html');
+
+    window.addEventListener('load', render);
+  </script>
+</body>
+</html>

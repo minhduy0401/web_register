@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Đăng nhập - Hệ thống đăng ký ca làm</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .login-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 420px;
+      width: 100%;
+      padding: 40px;
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .login-header h2 { 
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    
+    .login-header p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label { 
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+    
+    input[type="text"],
+    input[type="password"] { 
+      padding: 12px 16px;
+      width: 100%;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+    }
+    
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .btn-login { 
+      margin-top: 24px;
+      padding: 14px 20px;
+      width: 100%;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    
+    .btn-login:active {
+      transform: translateY(0);
+    }
+    
+    .demo-accounts {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .demo-accounts h3 {
+      font-size: 14px;
+      color: #667eea;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    .demo-accounts p {
+      font-size: 13px;
+      color: #666;
+      margin: 5px 0;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .demo-accounts strong {
+      color: #333;
+    }
+    
+    .error-message {
+      display: none;
+      padding: 12px;
+      margin-bottom: 20px;
+      background: #fee;
+      border: 1px solid #fcc;
+      border-radius: 8px;
+      color: #c33;
+      font-size: 14px;
+      text-align: center;
+    }
+    
+    .error-message.show {
+      display: block;
+      animation: shake 0.5s;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+    
+    @media (max-width: 600px) {
+      .login-container {
+        padding: 30px 20px;
+      }
+      
+      .login-header h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <h2>🔐 Đăng nhập</h2>
+      <p>Hệ thống đăng ký ca làm</p>
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">👤 Tên đăng nhập</label>
+        <input type="text" id="username" required autocomplete="username" placeholder="Nhập tên đăng nhập">
+      </div>
+
+      <div class="form-group">
+        <label for="password">🔑 Mật khẩu</label>
+        <input type="password" id="password" required autocomplete="current-password" placeholder="Nhập mật khẩu">
+      </div>
+
+      <button type="submit" class="btn-login">Đăng nhập</button>
+    </form>
+
+    <div class="demo-accounts">
+      <h3>📋 Tài khoản demo:</h3>
+      <p><strong>Admin:</strong> admin / admin123</p>
+      <p><strong>Nhân viên A:</strong> nva / 123456</p>
+      <p><strong>Nhân viên B:</strong> nvb / 123456</p>
+      <p><strong>Nhân viên C:</strong> nvc / 123456</p>
+      <p><strong>Nhân viên D:</strong> nvd / 123456</p>
+    </div>
+  </div>
+
+  <script>
+    const LS_AUTH = 'shift_auth_user';
+
+    // Danh sách tài khoản (trong thực tế nên lưu trên server)
+    const accounts = [
+      {
+        username: 'admin',
+        password: 'admin123',
+        role: 'admin',
+        name: 'Quản trị viên',
+        user_id: 'admin'
+      },
+      {
+        username: 'nva',
+        password: '123456',
+        role: 'staff',
+        name: 'Nguyễn A',
+        user_id: '1'
+      },
+      {
+        username: 'nvb',
+        password: '123456',
+        role: 'staff',
+        name: 'Nguyễn B',
+        user_id: '2'
+      },
+      {
+        username: 'nvc',
+        password: '123456',
+        role: 'staff',
+        name: 'Nguyễn C',
+        user_id: '3'
+      },
+      {
+        username: 'nvd',
+        password: '123456',
+        role: 'staff',
+        name: 'Nguyễn D',
+        user_id: '4'
+      }
+    ];
+
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.classList.add('show');
+      setTimeout(() => {
+        errorDiv.classList.remove('show');
+      }, 3000);
+    }
+
+    function login(username, password) {
+      const account = accounts.find(acc => 
+        acc.username === username && acc.password === password
+      );
+
+      if (account) {
+        // Lưu thông tin đăng nhập
+        const authData = {
+          username: account.username,
+          name: account.name,
+          role: account.role,
+          user_id: account.user_id,
+          login_time: new Date().toISOString()
+        };
+        localStorage.setItem(LS_AUTH, JSON.stringify(authData));
+
+        // Chuyển hướng theo quyền
+        if (account.role === 'admin') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'register.html';
+        }
+        return true;
+      }
+      return false;
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        showError('Vui lòng nhập đầy đủ thông tin!');
+        return;
+      }
+
+      if (login(username, password)) {
+        // Success - redirecting
+      } else {
+        showError('Tên đăng nhập hoặc mật khẩu không đúng!');
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+      }
+    });
+
+    // Kiểm tra nếu đã đăng nhập
+    window.addEventListener('load', function() {
+      const authData = localStorage.getItem(LS_AUTH);
+      if (authData) {
+        try {
+          const user = JSON.parse(authData);
+          // Đã đăng nhập, chuyển hướng
+          if (user.role === 'admin') {
+            window.location.href = 'admin.html';
+          } else {
+            window.location.href = 'register.html';
+          }
+        } catch (e) {
+          // Invalid data, clear it
+          localStorage.removeItem(LS_AUTH);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

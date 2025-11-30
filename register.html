@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Đăng ký ca làm - Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 520px;
+      width: 100%;
+      padding: 40px;
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    h2 { 
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 30px;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    
+    label { 
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    select, input[type=date] { 
+      padding: 12px 16px;
+      width: 100%;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+    }
+    
+    select:focus, input[type=date]:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .shifts { 
+      margin-top: 12px;
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+    }
+    
+    .shifts label {
+      display: flex;
+      align-items: center;
+      margin-top: 12px;
+      margin-bottom: 12px;
+      font-weight: 500;
+      font-size: 15px;
+      color: #555;
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: normal;
+      transition: color 0.3s ease;
+    }
+    
+    .shifts label:hover {
+      color: #667eea;
+    }
+    
+    .shifts input[type=checkbox] {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+    
+    .btn { 
+      margin-top: 24px;
+      padding: 14px 20px;
+      width: 100%;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    .btn-secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+    
+    .btn-secondary:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .user-info-bar {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 12px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 10px;
+      border: 2px solid #e0e0e0;
+    }
+    
+    .user-info-bar .user-name {
+      color: #667eea;
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 20px;
+      }
+      
+      h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📋 Đăng ký ca làm</h2>
+
+    <!-- User info and logout -->
+    <div class="user-info-bar">
+      <span class="user-name">👤 <span id="userName"></span></span>
+      <button class="btn btn-secondary" id="logoutBtn" style="margin-left: 10px; padding: 8px 16px; display: inline-block; width: auto; margin-top: 0;">🚪 Đăng xuất</button>
+    </div>
+
+    <form id="regForm">
+      <label>Chọn nhân viên</label>
+      <select id="staffSelect" required>
+        <!-- Danh sách nhân viên: chỉnh ở đây -->
+        <option value="">-- Chọn nhân viên --</option>
+        <option value="1">Nguyễn A</option>
+        <option value="2">Nguyễn B</option>
+        <option value="3">Nguyễn C</option>
+        <option value="4">Nguyễn D</option>
+      </select>
+
+      <label>Ngày làm</label>
+      <input type="date" id="dateInput" required />
+
+      <label>Chọn ca</label>
+      <div class="shifts">
+        <label><input type="checkbox" name="shift" value="morning"> 🌅 Ca sáng (09:00 - 13:00)</label>
+        <label><input type="checkbox" name="shift" value="afternoon"> ☀️ Ca chiều (13:00 - 17:00)</label>
+        <label><input type="checkbox" name="shift" value="evening"> 🌙 Ca tối (17:00 - 22:00)</label>
+      </div>
+
+      <button class="btn btn-primary" type="submit">Gửi đăng ký</button>
+    </form>
+
+    <button class="btn btn-secondary" id="goAdmin" style="display: none;">Mở trang quản lý</button>
+  </div>
+
+  <script>
+    // ---- Authentication check ----
+    const LS_AUTH = 'shift_auth_user';
+    
+    function checkAuth() {
+      const authData = localStorage.getItem(LS_AUTH);
+      if (!authData) {
+        window.location.href = 'login.html';
+        return null;
+      }
+      try {
+        return JSON.parse(authData);
+      } catch (e) {
+        localStorage.removeItem(LS_AUTH);
+        window.location.href = 'login.html';
+        return null;
+      }
+    }
+
+    function logout() {
+      if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        localStorage.removeItem(LS_AUTH);
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Initialize page with auth
+    const currentUser = checkAuth();
+    if (currentUser) {
+      document.getElementById('userName').textContent = currentUser.name;
+      
+      // Nếu là admin, hiển thị nút quản lý
+      if (currentUser.role === 'admin') {
+        document.getElementById('goAdmin').style.display = 'block';
+      }
+
+      // Nếu là staff, tự động chọn nhân viên của họ và disable select
+      const staffSelect = document.getElementById('staffSelect');
+      if (currentUser.role === 'staff') {
+        // Xóa option mặc định
+        staffSelect.innerHTML = '';
+        // Thêm option của nhân viên đó
+        const option = document.createElement('option');
+        option.value = currentUser.user_id;
+        option.textContent = currentUser.name;
+        option.selected = true;
+        staffSelect.appendChild(option);
+        staffSelect.disabled = true;
+        staffSelect.style.background = '#e9ecef';
+        staffSelect.style.cursor = 'not-allowed';
+      } else {
+        // Admin có thể chọn bất kỳ nhân viên nào
+        staffSelect.innerHTML = `
+          <option value="">-- Chọn nhân viên --</option>
+          <option value="1">Nguyễn A</option>
+          <option value="2">Nguyễn B</option>
+          <option value="3">Nguyễn C</option>
+          <option value="4">Nguyễn D</option>
+        `;
+      }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // ---- Utility: get/save registrations to localStorage
+    const LS_KEY = 'shift_registrations_demo';
+    function loadRegs() {
+      const raw = localStorage.getItem(LS_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }
+    function saveRegs(arr) {
+      localStorage.setItem(LS_KEY, JSON.stringify(arr));
+    }
+
+    // Submit handler
+    document.getElementById('regForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      const staffId = document.getElementById('staffSelect').value;
+      const staffName = document.getElementById('staffSelect').options[document.getElementById('staffSelect').selectedIndex].text;
+      const date = document.getElementById('dateInput').value;
+      const checked = Array.from(document.querySelectorAll('input[name="shift"]:checked')).map(c => c.value);
+
+      if (!date) { alert('Vui lòng chọn ngày.'); return; }
+      if (checked.length === 0) { alert('Vui lòng chọn ít nhất 1 ca.'); return; }
+
+      // load and append
+      const regs = loadRegs();
+      // for each selected shift, push a registration entry
+      checked.forEach(shift => {
+        regs.push({
+          id: Date.now() + Math.random(), // simple unique id
+          user_id: staffId,
+          user_name: staffName,
+          date: date,
+          shift: shift,
+          created_at: new Date().toISOString()
+        });
+      });
+      saveRegs(regs);
+      alert('Đăng ký thành công!');
+      // reset form
+      document.getElementById('regForm').reset();
+    });
+
+    document.getElementById('goAdmin').addEventListener('click', function(){
+      window.location.href = 'admin.html';
+    });
+  </script>
+</body>
+</html>
